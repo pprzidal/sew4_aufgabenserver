@@ -58,32 +58,32 @@ Allgemein:
 
 Um auch mit aufwendigen Fragenerstellungen umgehen zu können, sollen alle Aufgaben in Hintergrundthreads erstellt werden. Außerdem sollen nun Threadpools zum Einsatz kommen:
 
-    Der Server hat einen Puffer für 20 Aufgaben
-        es sollen auch andere Kapazitäten als 20 unterstützt werden
-        Hinweis: Producer-Consumer-Schema!
-        etwaige Synchronisationslogik für den Puffer soll in einer Klasse gekapselt sein
-    Die Aufgaben-Generierung passiert nicht mehr beim Client-Handler, sondern in einem eigenen Thread
-        implementiere einen weiteren Fragengenerator (z.B. den nicht als GKÜ umgesetzten von oben) und starte auch diesen.
-    Alle Hintergrundthreads (Aufgabenerstellung, Client-Handling) werden über einen Threadpool verwaltet
-        mach dir Gedanken über die Anzahl der Hintergrundthreads: mit fixed und cached thread pools besteht die Möglichkeit, eine maximale Anzahl oder beliebig viele Hintergrundthreads zu haben. Was ist bei dieser Aufgabe sinnvoll bzw. wie kann die Wahl das Verhalten des Servers beeinflussen?
+* Der Server hat einen Puffer für 20 Aufgaben
+    - es sollen auch andere Kapazitäten als 20 unterstützt werden
+    - Hinweis: Producer-Consumer-Schema!
+    - etwaige Synchronisationslogik für den Puffer soll in einer Klasse gekapselt sein
+* Die Aufgaben-Generierung passiert nicht mehr beim Client-Handler, sondern in einem eigenen Thread
+    - implementiere einen weiteren Fragengenerator (z.B. den nicht als GKÜ umgesetzten von oben) und starte auch diesen.
+* Alle Hintergrundthreads (Aufgabenerstellung, Client-Handling) werden über einen Threadpool verwaltet
+    - mach dir Gedanken über die Anzahl der Hintergrundthreads: mit fixed und cached thread pools besteht die Möglichkeit, eine maximale Anzahl oder beliebig viele Hintergrundthreads zu haben. Was ist bei dieser Aufgabe sinnvoll bzw. wie kann die Wahl das Verhalten des Servers beeinflussen?
 
 Zusätzliche Anforderungen EK vollständig - Variante 1: Automatisierung/Schummler
 
 Ändere den Client so, dass er manche Fragen automatisch beantwortet, z.B. Rechenaufgaben
 
-    Kann die Frage automatisch beantwortet werden, wird nicht auf eine Benutzereingabe gewartet; stattdessen wird die Antwort sofort an die Benutzer*in ausgegeben und an den Server geschickt.
-    (dazu den Fixe-Liste-an-Fragen Generator zu verwenden ist erlaubt, aber langweilig ;))
+* Kann die Frage automatisch beantwortet werden, wird nicht auf eine Benutzereingabe gewartet; stattdessen wird die Antwort sofort an die Benutzer*in ausgegeben und an den Server geschickt.
+* (dazu den Fixe-Liste-an-Fragen Generator zu verwenden ist erlaubt, aber langweilig ;))
 
-Zusätzliche Anforderungen EK vollständig - Variante 2: Maschinenlesbares Protokoll
+## Zusätzliche Anforderungen EK vollständig - Variante 2: Maschinenlesbares Protokoll
 
 Das vorgeschlagene Protokoll ist mit Texten wie Korrekt! oder 1/2 Fragen richtig beantwortet darauf ausgelegt, dass die Ausgaben direkt von Menschen gelesen werden. Verwende stattdessen maschinenlesbarere, "strukturierte" Nachrichten (z.B. false,TGM oder 0,TGM statt Falsch! Richtig wäre "TGM"; 1,2 statt 1/2 Fragen richtig beantwortet; "weniger implizit" angeben, ob noch eine Frage kommt - object streams sind auch möglich) und formuliere daraus clientseitig wieder menschenlesbare Nachrichten für die Ausgabe.
 
 Dadurch kann der Client eine bessere Ausgabe bieten, obwohl der Server auch weiterhin keine zusätzlichen Daten schickt. Mach dir das zunutze, indem du
 
-    nach jeder Frage eine Zwischenstatistik ausgibst
-    bei den Zwischen- und Endstatistiken die richtigen Antworten auch in Prozent ausgibst.
+* nach jeder Frage eine Zwischenstatistik ausgibst
+* bei den Zwischen- und Endstatistiken die richtigen Antworten auch in Prozent ausgibst.
 
-Zusätzliche Anforderungen EK vollständig - Variante 3: GUI
+## Zusätzliche Anforderungen EK vollständig - Variante 3: GUI
 
 Anspruchsvoll! Gib als "Sicherheitsnetz" jedenfalls auf GKV/EKÜ-Niveu ab, bevor du diese Erweiterung angehst.
 
@@ -91,15 +91,15 @@ Erstelle eine GUI (z.B. Swing oder Android-App - nicht JOptionPane!) als Ersatz 
 
 Da Netzwerk-Kommunikation sonst die UI blockieren würde, müssen wir hier Multithreading einsetzen. Orientiere dich z.B. an diesen Quellen für Swing und Android. Das Grundprinzip wird etwa folgendes sein:
 
-    beim Programmstart wird die GUI gestartet und eine Netzwerkverbindung hergestellt:
-        bei Swing läuft die UI im Event-Dispatching-Thread, die Netzwerkverbindung kann also im Main-Thread laufen
-        bei Android läuft die UI (oft) im Main-Thread, die Netzwerkverbindung muss also in einem Hintergrund-Thread gestartet werden
-        der Netzwerk-Thread ist verantwortlich, wie üblich die Verbindung sauber zu beenden
-    immer wenn vom Server eine Nachricht an den Client kommt, muss eine Aktion im UI-Thread gesetzt werden um z.B. eine Frage anzuzeigen: SwingUtilities.invokeLater(Runnable) / View.post(Runnable)
-    wenn vom User eine Antwort erwartet wird, muss der Netzwerk-Thread blockieren, bis diese Antwort angekommen ist. Dafür kann die UI als Producer und der Netzwerk-Thread als Consumer angesehen werden. Sobald die Daten beim Netzwerk-Thread angekommen sind, schickt der Netzwerk-Thread die Daten an den Server.
+* beim Programmstart wird die GUI gestartet und eine Netzwerkverbindung hergestellt:
+    - bei Swing läuft die UI im Event-Dispatching-Thread, die Netzwerkverbindung kann also im Main-Thread laufen
+    - bei Android läuft die UI (oft) im Main-Thread, die Netzwerkverbindung muss also in einem Hintergrund-Thread gestartet werden
+    - der Netzwerk-Thread ist verantwortlich, wie üblich die Verbindung sauber zu beenden
+* immer wenn vom Server eine Nachricht an den Client kommt, muss eine Aktion im UI-Thread gesetzt werden um z.B. eine Frage anzuzeigen: SwingUtilities.invokeLater(Runnable) / View.post(Runnable)
+* wenn vom User eine Antwort erwartet wird, muss der Netzwerk-Thread blockieren, bis diese Antwort angekommen ist. Dafür kann die UI als Producer und der Netzwerk-Thread als Consumer angesehen werden. Sobald die Daten beim Netzwerk-Thread angekommen sind, schickt der Netzwerk-Thread die Daten an den Server.
 
-Abgabe
+## Abgabe
 
-    Upload des jar inkl. source code hier im Kurs.
-    Demonstration der Lösung in einem Abgabegespräch, wobei die eigene Lösung erklärt werden kann.
+* Upload des jar inkl. source code hier im Kurs.
+* Demonstration der Lösung in einem Abgabegespräch, wobei die eigene Lösung erklärt werden kann.
 

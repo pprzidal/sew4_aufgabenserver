@@ -23,7 +23,7 @@ public class AufgabenClient {
             while ((fromServer = in.readLine()) != null) {
                 System.out.println(fromServer);
                 if(fromServer.contains("Fragen richtig beantwortet")) break;
-                if(fromServer.contains("?")) {
+                if(fromServer.endsWith("?")) {
                     String u = sc.nextLine();
                     out.println(u);
                 }
